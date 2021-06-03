@@ -5,7 +5,7 @@ el-form.addtrade-form
     el-form-item(label='Price step')
       el-input-number(v-model='priceStep' controls-position='right')
 
-    el-form-item(label='Step cost')
+    el-form-item(label='Pts cost')
       el-input-number(v-model='ptsCost' controls-position='right')
 
     el-form-item(label='Stop pts')
@@ -19,12 +19,13 @@ el-form.addtrade-form
 <script lang="ts">
 import { computed as c, toRefs, defineComponent, Ref } from 'vue'
 import { tradeMixin, buildChangePropEmiter } from '@/common/FormComponentMixin'
+import { IState } from '@/common/DataItems'
 
 export default defineComponent({
   ...tradeMixin,
   setup(props, { emit }) {
     const propRefs = toRefs(props)
-    const model = propRefs.model as any as Ref<ReadonlyMap<string, any>>
+    const model = propRefs.model as any as Ref<IState>
 
     const emitPropBuilder = buildChangePropEmiter(model, emit)
 

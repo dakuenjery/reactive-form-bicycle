@@ -33,12 +33,13 @@ el-form.addtrade-form
 import { computed as c, toRefs, defineComponent, Ref } from 'vue'
 import instModule from '@/store/InstrumentsModule'
 import { tradeMixin, buildChangePropEmiter } from '@/common/FormComponentMixin'
+import { IState } from '@/common/DataItems'
 
 export default defineComponent({
   ...tradeMixin,
   setup(props, { emit }) {
     const propRefs = toRefs(props)
-    const model = propRefs.model as any as Ref<ReadonlyMap<string, any>>
+    const model = propRefs.model as Ref<IState>
 
     const emitPropBuilder = buildChangePropEmiter(model, emit)
 

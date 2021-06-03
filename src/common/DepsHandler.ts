@@ -79,8 +79,12 @@ export function buildAdjMap(pdeps: IDependsOn[]): AdjMap {
 
   for (const { id, dependsOn } of pdeps) {
     for (const dep of dependsOn) {
-      const depsSet = adjObj[dep]
-      depsSet.add(id)
+      try {
+        const depsSet = adjObj[dep]
+        depsSet.add(id)
+      } catch (e) {
+        throw new Error(`Could not find dependency ${dep}`)
+      }
     }
   }
 
