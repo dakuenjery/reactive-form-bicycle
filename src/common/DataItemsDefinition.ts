@@ -76,6 +76,9 @@ export const DataItems: IDataItem<any>[] = [
       offset = roundAs($take_pts * $price_step, $price_step)
       $enter_price + offset * sign($lots)
     `,
+    // formula_profit: `
+    //   $stop_pts * $profit
+    // `,
     // dependsOn: ['take_pts', 'enter_price', 'price_step', 'trade_type'],
     // compute: (values: any) => {
     //   const tt: string | undefined = values.trade_type

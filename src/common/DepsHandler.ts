@@ -1,12 +1,21 @@
-import mapKeys from 'lodash/mapKeys'
-import keyBy from 'lodash/keyBy'
-import reduce from 'lodash/reduce'
-import without from 'lodash/without'
-import { mapValues } from 'lodash'
+import {
+  mapValues,
+  without,
+  isArray,
+  mapKeys,
+  union,
+  keyBy,
+  reduce,
+  difference
+} from 'lodash'
+
+// import mapValues from 'lodash/mapValues'
 
 enum NodeColor {
   White,
-  Grey
+  Grey,
+  Black,
+  Red
 }
 
 type Dictionary<T> = { [index: string]: T }
@@ -44,8 +53,9 @@ function excludeAdj(adj: AdjMap, exclude: string[] = []): AdjMap {
 export function resolveDepDfs(rootId: string, adj: AdjMap): IDeps {
   const nodeColors = buildColoredMap(adj)
   const visitOrderArr: string[] = []
+  const inOrder: string[] = []
 
-  dfs(rootId, nodeColors, adj, visitOrderArr)
+  dfs(rootId, nodeColors, adj, inOrder, visitOrderArr)
 
   return {
     id: rootId,
@@ -54,17 +64,85 @@ export function resolveDepDfs(rootId: string, adj: AdjMap): IDeps {
   }
 }
 
-function dfs(id: string, colors: ColorMap, adj: AdjMap, orderArr: string[]) {
+function dfs(id: string, colors: ColorMap, adj: AdjMap, inOrder: string[], postOrder: string[]) {
   colors[id] = NodeColor.Grey
+  inOrder.push(id)
 
   for (const itemId of adj[id]!) {
     const itemColor = colors[itemId]!
 
     if (itemColor === NodeColor.White)
-      dfs(itemId, colors, adj, orderArr)
+      dfs(itemId, colors, adj, inOrder, postOrder)
+    // else if (itemColor === NodeColor.Grey)
+    // throw new CycleError(itemId, inOrder)
   }
 
-  orderArr.push(id)
+  if (colors[id] === NodeColor.Grey) {
+    colors[id] = NodeColor.Black
+    postOrder.push(id)
+  }
+}
+
+export function resolveDepBfs(id: string, adj: AdjMap /*, depsMap: AdjMap */): IDeps {
+  const resolved: string[] = []
+
+  let unresolved: string[] = [id]
+  let shifts = unresolved.length
+
+  while (unresolved.length > 0 && shifts > -1) {
+    shifts -= 1
+    const elem = unresolved.shift()!
+    // const deps = depsMap[elem]!
+
+    // if (!containsAll(resolved, deps)) {
+    //   unresolved.push(elem)
+    //   continue
+    // }
+
+    // resolved = uniqPush(resolved, elem)
+    resolved.push(elem)
+
+    const children = adj[elem]
+
+    const notHandled = difference(children, resolved)
+    unresolved = uniqPush(unresolved, notHandled)
+    shifts = unresolved.length
+  }
+
+  return {
+    id,
+    dependencies: resolved.slice(1),
+    ignored: unresolved
+  }
+}
+
+class CycleError extends Error {
+  constructor(itemId: string, inOrder: string[]) {
+    const msg = inOrder.reduce((acc, x) => {
+      let sep = '->'
+
+      if (acc === '')
+        sep = ''
+
+      if (x === itemId)
+        sep = ' |> '
+
+      return `${acc}${sep}${x}`
+    }, '')
+
+    super(`${msg}->${itemId})`)
+  }
+}
+
+function containsAll(arr: string[], target: string[]): boolean {
+  return target.every(x => arr.includes(x))
+}
+
+function uniqPush(arr: string[], elems: string[] | string): string[] {
+  if (isArray(elems))
+    return [...new Set([...arr, ...elems])]
+  else
+    return [...new Set([...arr, elems])]
 }
 
 function buildColoredMap(adj: AdjMap): ColorMap {
@@ -89,4 +167,11 @@ export function buildAdjMap(pdeps: IDependsOn[]): AdjMap {
   }
 
   return mapValues(adjObj, set => [...set])
+}
+
+export function buildDepsMap(pdeps: IDependsOn[]): AdjMap {
+  return pdeps.reduce((obj: any, deps) => {
+    obj[deps.id] = deps.dependsOn
+    return obj
+  }, {})
 }
