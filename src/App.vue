@@ -10,7 +10,7 @@ div.flex.justify-center.container.m-8
 </template>
 
 <script lang="ts">
-import { computed as c, defineComponent, ref } from 'vue'
+import { computed as c, defineComponent } from 'vue'
 import tradeModule from '@/store/TradeEditModule'
 import TradeBasicParamsForm from '@/components/TradeBasicParamsForm.vue'
 import TradeRiskParamsForm from '@/components/TradeRiskParamsForm.vue'

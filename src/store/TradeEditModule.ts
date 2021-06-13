@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
 import { VuexModule, Module, Mutation, Action } from 'vuex-class-modules'
 import { DataItems } from '@/common/DataItemsDefinition'
-import { buildDataObject, DataObject, IState, ICommitArg, IDataItem } from '@/common/DataItems'
+import { DataObject } from '@/common/DataObject'
+import { IState, ICommitArg, IDataItem } from '@/common/DataTypes'
 import defaults from 'lodash/defaults'
 import clone from 'lodash/clone'
 import store from '.'
@@ -13,12 +15,15 @@ interface IModuleMutation {
 
 @Module
 class TradeEditModule extends VuexModule {
-  private dataItems = DataItems
-  private dataObj: DataObject = buildDataObject(this.dataItems)
+  dataItems = DataItems
+  dataObj: DataObject = new DataObject(this.dataItems)
   state: IState = this.dataObj.buildDefaultState()
+  lastCommits: ICommitArg[] = []
 
   @Mutation
   private mutateValues(values: ICommitArg[]) {
+    this.lastCommits = values
+
     for (const { prop, value } of values)
       this.state[prop] = value
   }
@@ -33,7 +38,7 @@ class TradeEditModule extends VuexModule {
   @Action
   async addField(field: { id: string; formula: string }) {
     const dataItems = [...this.dataItems, field]
-    const dataObj = buildDataObject(dataItems)
+    const dataObj = new DataObject(dataItems)
     const defState = dataObj.buildDefaultState()
     const state = defaults(clone(this.state), defState)
 
@@ -47,6 +52,7 @@ class TradeEditModule extends VuexModule {
   async update({ prop, value }: ICommitArg) {
     try {
       const commits = this.dataObj.update(prop, value, this.state)
+      console.log(commits)
       this.mutateValues(commits)
     } catch (err) {
       console.error('update err', err)

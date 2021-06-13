@@ -36,11 +36,13 @@ export interface IDeps {
 }
 
 export function resolveDeps(items: IDependsOn[]) {
-  const depsMap = buildAdjMap(items)
+  const adjMap = buildAdjMap(items)
+  // const depsMap = buildDepsMap(items)
 
   const updatePaths = items.map((x) => {
-    const adj = excludeAdj(depsMap, x.exclude)
-    return resolveDepDfs(x.id, adj)
+    const adj = excludeAdj(adjMap, x.exclude)
+    return resolveDep(x.id, adj)//, depsMap)
+    // return resolveDepDfs(x.id, adj)
   })
 
   return mapKeys(updatePaths, x => x.id)
@@ -83,7 +85,7 @@ function dfs(id: string, colors: ColorMap, adj: AdjMap, inOrder: string[], postO
   }
 }
 
-export function resolveDepBfs(id: string, adj: AdjMap /*, depsMap: AdjMap */): IDeps {
+export function resolveDep(id: string, adj: AdjMap /*, depsMap: AdjMap */): IDeps {
   const resolved: string[] = []
 
   let unresolved: string[] = [id]
@@ -94,12 +96,11 @@ export function resolveDepBfs(id: string, adj: AdjMap /*, depsMap: AdjMap */): I
     const elem = unresolved.shift()!
     // const deps = depsMap[elem]!
 
-    // if (!containsAll(resolved, deps)) {
+    // if (unresolved.length > 0 && !containsAll(resolved, deps)) {
     //   unresolved.push(elem)
     //   continue
     // }
 
-    // resolved = uniqPush(resolved, elem)
     resolved.push(elem)
 
     const children = adj[elem]

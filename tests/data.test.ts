@@ -1,7 +1,6 @@
 /* eslint-disable no-use-before-define */
-import { buildDataObject, DataObject, IState, ICommitArg } from '@/common/DataItems'
-import forEach from 'lodash/forEach'
-import get from 'lodash/get'
+import { DataObject } from '@/common/DataObject'
+import { IState, ICommitArg, IDataItem } from '@/common/DataTypes'
 import defaults from 'lodash/defaults'
 
 const TEST_DATA_DEPS_ON = {
@@ -34,7 +33,7 @@ const TEST_DATA_DEFAULTS = {
   take_pts: 30,
 }
 
-const TEST_DATA = [
+const TEST_DATA: IDataItem<any>[] = [
   {
     id: 'enter_price'
   },
@@ -44,14 +43,14 @@ const TEST_DATA = [
   },
   {
     id: 'stop_price',
-    formula: `
+    compute: `
       offset = roundAs($stop_pts * $price_step, $price_step)
       $enter_price + offset * sign($lots) * -1
     `
   },
   {
     id: 'take_price',
-    formula: `
+    compute: `
       offset = roundAs($take_pts * $price_step, $price_step)
       $enter_price + offset * sign($lots)
     `
@@ -63,46 +62,34 @@ const TEST_DATA = [
   {
     id: 'stop_pts',
     default: 10,
-    formula: `
+    compute: `
       ceil(abs($enter_price - $stop_price) / $price_step)
     `
   },
   {
     id: 'take_pts',
     default: 30,
-    formula: `
+    compute: `
       ceil(abs($enter_price - $take_price) / $price_step)
     `
   }
 ]
 
-test('DataObject depends', () => {
-  const dataObj = buildDataObject(TEST_DATA)
-  const obj = buildObjDeep(dataObj, 'dependsOn')
-  expect(obj).toEqual(TEST_DATA_DEPS_ON)
-})
-
-test('DataObject updatePath', () => {
-  const dataObj = buildDataObject(TEST_DATA)
-  const obj = buildObjDeep(dataObj, 'updatePath')
-  expect(obj).toEqual(TEST_DATA_UPD_PATHS)
-})
-
 test('default state', () => {
-  const dataObj = buildDataObject(TEST_DATA)
+  const dataObj = new DataObject(TEST_DATA)
   const state = dataObj.buildDefaultState()
 
   expect(state).toEqual(TEST_DATA_DEFAULTS)
 })
 
 describe('update', () => {
-  const dataObj = buildDataObject(TEST_DATA)
+  const dataObj = new DataObject(TEST_DATA)
   const state = dataObj.buildDefaultState()
 
-  const commits = dataObj.update('enter_price', 100, state)
-  commit(state, commits)
-
   test('enter_price := 100', () => {
+    const commits = dataObj.update('enter_price', 100, state)
+    commit(state, commits)
+
     const expected = defaults({
       enter_price: 100,
       stop_price: 90,
@@ -180,14 +167,4 @@ function commit(state: IState, commits: ICommitArg[]) {
   commits.forEach(({ prop, value }) => {
     state[prop] = value
   })
-}
-
-function buildObjDeep(dataObj: DataObject, path: string) {
-  const obj: any = {}
-
-  forEach(dataObj.properties, (value, key) => {
-    obj[key] = get(value, path)
-  })
-
-  return obj
 }

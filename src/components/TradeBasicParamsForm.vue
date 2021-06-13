@@ -15,28 +15,24 @@ el-form.addtrade-form
               :label='inst.instrument'
               :value='inst.instrument')
 
-    el-form-item(label='Enter price')
-      el-input-number(v-model='enter' controls-position='right')
-
-    el-form-item(label='Stop price')
-      el-input-number(v-model='stop' controls-position='right')
-
-    el-form-item(label='Take price')
-      el-input-number(v-model='take' controls-position='right')
-
-    el-form-item(label='Lots')
-      el-input-number(v-model='lots' controls-position='right')
+    data-item(propId='enter_price' label='Enter price')
+    data-item(propId='stop_price' label='Stop price')
+    data-item(propId='take_price' label='Take price')
+    data-item(propId='lots' label='Lots')
 
 </template>
 
 <script lang="ts">
-import { computed as c, toRefs, defineComponent, Ref } from 'vue'
+import { computed as c, toRefs, defineComponent, Ref, provide } from 'vue'
 import instModule from '@/store/InstrumentsModule'
 import { tradeMixin, buildChangePropEmiter } from '@/common/FormComponentMixin'
-import { IState } from '@/common/DataItems'
+import DataInfo from '@/components/DataInfo.vue'
+import DataItem from '@/components/DataItem.vue'
+import { IState } from '@/common/DataTypes'
 
 export default defineComponent({
   ...tradeMixin,
+  components: { DataInfo, DataItem },
   setup(props, { emit }) {
     const propRefs = toRefs(props)
     const model = propRefs.model as Ref<IState>
@@ -56,15 +52,11 @@ export default defineComponent({
         return 'New trade'
     })
 
+    provide('propBuilder', emitPropBuilder)
+
     return {
       instruments,
-
       inst: emitPropBuilder('instrument'),
-
-      enter: emitPropBuilder('enter_price'),
-      stop: emitPropBuilder('stop_price'),
-      take: emitPropBuilder('take_price'),
-      lots: emitPropBuilder('lots'),
       tradeType
     }
   }

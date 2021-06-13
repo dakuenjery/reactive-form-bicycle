@@ -1,8 +1,8 @@
 /* eslint-disable no-use-before-define */
 import {
   buildAdjMap,
+  resolveDep,
   resolveDepDfs,
-  resolveDepBfs,
   buildDepsMap
 } from '@/common/DepsHandler'
 
@@ -11,82 +11,39 @@ test('build depsOn map', () => {
   expect(adj).toEqual(TEST_DATA_DEPS_ON)
 })
 
-test('resolve stop_price bfs', () => {
+test('resolve stop_price', () => {
   const adj = buildAdjMap(TEST_DATA)
-  const dep = resolveDepBfs('stop_price', adj)
+  const dep = resolveDep('stop_price', adj)
   expect(dep.dependencies).toEqual(['stop_pts', 'profit_ratio', 'take_pts', 'take_price'])
 })
 
-test('resolve enter_price dfs', () => {
+test('resolve enter_price', () => {
   const adj = buildAdjMap(TEST_DATA)
-  const dep = resolveDepBfs('enter_price', adj)
+  const dep = resolveDep('enter_price', adj)
   expect(dep.dependencies)
     .toEqual(['stop_price', 'take_price', 'stop_pts', 'take_pts', 'profit_ratio'])
 })
 
-test('resolve profit dfs', () => {
+test('resolve profit', () => {
   const adj = buildAdjMap(TEST_DATA)
-  const dep = resolveDepBfs('profit_ratio', adj)
+  const dep = resolveDep('profit_ratio', adj)
   expect(dep.dependencies)
     .toEqual(['take_pts', 'take_price'])
 })
 
-test('resolve price_step dfs', () => {
+test('resolve price_step', () => {
   const adj = buildAdjMap(TEST_DATA)
-  const dep = resolveDepBfs('price_step', adj)
+  const dep = resolveDep('price_step', adj)
   expect(dep.dependencies)
     .toEqual(['stop_price', 'take_price', 'stop_pts', 'take_pts', 'profit_ratio'])
 })
 
-test('resolve stop_pts dfs', () => {
+test('resolve stop_pts', () => {
   const adj = buildAdjMap(TEST_DATA)
-  const dep = resolveDepBfs('stop_pts', adj)
+  const dep = resolveDep('stop_pts', adj)
   expect(dep.dependencies)
     .toEqual(['stop_price', 'profit_ratio', 'take_pts', 'take_price'])
 })
-
-// test('resolve stop_price dfs', () => {
-//   const adj = buildAdjMap(TEST_DATA)
-//   const dep = resolveDepDfs('stop_price', adj)
-//   expect(dep.dependencies).toEqual(['stop_pts', 'profit_ratio'])
-// })
-
-// test('resolve enter_price dfs', () => {
-//   const adj = buildAdjMap(TEST_DATA)
-//   const dep = resolveDepDfs('enter_price', adj)
-//   expect(dep.dependencies).toEqual(['take_pts', 'take_price', 'stop_pts', 'profit_ratio', 'stop_price'])
-// })
-
-// test('resolve price_step dfs', () => {
-//   const adj = buildAdjMap(TEST_DATA)
-//   const dep = resolveDepDfs('price_step', adj)
-//   expect(dep.dependencies).toEqual(['take_pts', 'take_price', 'stop_pts', 'profit_ratio', 'stop_price'])
-// })
-
-// test('resolve stop_pts dfs', () => {
-//   const adj = buildAdjMap(TEST_DATA)
-//   const dep = resolveDepDfs('stop_pts', adj)
-//   expect(dep.dependencies).toEqual(['profit_ratio', 'stop_price'])
-// })
-
-// test('resolve a dfs', () => {
-//   const adj = buildAdjMap(TEST_DATA_2)
-//   const dep = resolveDepDfs('a', adj)
-//   expect(dep.dependencies).toEqual([...'cfbedg'])
-// })
-
-// test('resolve f from test_data_3', () => {
-//   const adj = buildAdjMap(TEST_DATA_3)
-//   const dep = resolveDepDfs('f', adj)
-//   expect(dep.dependencies).toEqual([...'gibdehca'])
-// })
-
-// test('resolve f from test_data_3 bfs', () => {
-//   const adj = buildAdjMap(TEST_DATA_3)
-//   const deps = buildDepsMap(TEST_DATA_3)
-//   const dep = resolveDepBfs('f', adj, deps)
-//   expect(dep.dependencies).toEqual([...'bgadiceh'])
-// })
 
 const TEST_DATA_DEPS_ON = {
   enter_price: ['stop_price', 'take_price', 'stop_pts', 'take_pts'],
@@ -165,6 +122,13 @@ const TEST_DATA_2 = [
   }
 ]
 
+test('cycle test', () => {
+  const adj = buildAdjMap(TEST_DATA_3)
+  const dep = resolveDep('f', adj)
+  expect(dep.dependencies)
+    .toEqual('')
+})
+
 const TEST_DATA_3 = [
   {
     id: 'f',
@@ -177,7 +141,7 @@ const TEST_DATA_3 = [
   {
     id: 'g',
     // dependsOn: ['f']
-    dependsOn: ['f', 'h']
+    dependsOn: ['f', 'd']
   },
   {
     id: 'a',

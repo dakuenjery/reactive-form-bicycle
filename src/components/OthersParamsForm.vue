@@ -9,9 +9,8 @@ el-form.addtrade-form
           @click='dialogVisible = true'
           icon='el-icon-plus')
 
-    template(v-for='prop in formProps' :key='prop.key')
-      el-form-item(:label='prop.key')
-        el-input-number(v-model='prop.value' controls-position='right')
+    template(v-for='prop in formProps' :key='prop')
+      data-item(:propId='prop')
 
     template(v-if='isFormEmpty')
       el-empty.p-0(:image-size='50'
@@ -37,9 +36,10 @@ el-form.addtrade-form
 </template>
 
 <script lang="ts">
-import { computed as c, toRefs, defineComponent, Ref, ref } from 'vue'
+import { computed as c, toRefs, defineComponent, Ref, ref, provide } from 'vue'
 import { tradeMixin, buildChangePropEmiter } from '@/common/FormComponentMixin'
-import { IState } from '@/common/DataItems'
+import DataItem from '@/components/DataItem.vue'
+import { IState } from '@/common/DataTypes'
 import { ElMessage } from 'element-plus'
 import tradeModule from '@/store/TradeEditModule'
 import keys from 'lodash/keys'
@@ -60,19 +60,15 @@ const ignoreProps = [
 
 export default defineComponent({
   ...tradeMixin,
+  components: { DataItem },
   setup(props, { emit }) {
     const propRefs = toRefs(props)
     const model = propRefs.model as Ref<IState>
 
     const emitPropBuilder = buildChangePropEmiter(model, emit)
+    provide('propBuilder', emitPropBuilder)
 
-    const formProps = c(() => {
-      const propIds = without(keys(model.value), ...ignoreProps)
-      return propIds.map(x => ({
-        key: x,
-        value: emitPropBuilder(x)
-      }))
-    })
+    const formProps = c(() => without(keys(model.value), ...ignoreProps))
 
     const isFormEmpty = c(() => formProps.value.length === 0)
 
@@ -86,7 +82,7 @@ export default defineComponent({
     const addField = () => {
       const v = addModel.value
 
-      if (v.id.trim() === '' || v.formula.trim() === '') {
+      if (v.id.trim() === '') {
         ElMessage.error('Incorrect input :(')
         return
       }
@@ -100,17 +96,12 @@ export default defineComponent({
       }
     }
 
-    const removeField = (propKey: string) => {
-
-    }
-
     return {
       formProps,
       isFormEmpty,
       dialogVisible,
       addModel,
-      addField,
-      removeField
+      addField
     }
   }
 })

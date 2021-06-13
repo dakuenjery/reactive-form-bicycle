@@ -1,5 +1,4 @@
 import { create, all } from 'mathjs'
-import round from 'lodash/round'
 
 test('simple expression', () => {
   const m = create(all)
