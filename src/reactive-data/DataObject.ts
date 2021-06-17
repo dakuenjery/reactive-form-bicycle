@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
-import { resolveDeps, IDependsOn } from '@/common/DepsHandler'
 import {
   filter,
   keyBy,
   forEach,
   isArray
 } from 'lodash'
+import { resolveDeps, IDependsOn } from './DepsHandler'
 
 import {
   IState,
@@ -36,6 +36,7 @@ export class DataObject {
 
   update(id: string, value: any, state: IState): ICommitArg[] {
     const ctx = createContext(id, state)
+    console.log('create ctx: ', ctx)
 
     try {
       const commits: ICommitArg[] = []
@@ -78,7 +79,10 @@ export class DataObject {
 
     for (const p of updateProps) {
       try {
+        console.log(`evaluate ${p.id}. ctx: `, ctx)
         const value = p.compute.func(ctx)
+        console.log(`evaluated ${p.id}. value: `, value)
+
         this.commit(p.id, value, ctx, commits)
       } catch (e) {
         console.warn(`Error evaluate ${p.id}`, e)

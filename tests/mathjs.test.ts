@@ -105,3 +105,14 @@ test('variables', () => {
 
   expect(value.entries[1]).toEqual(20)
 })
+
+
+test('Conditional', () => {
+  const m = create(all)
+
+  const value = m.evaluate!(`
+    equalText(c, d) ? a : b
+  `, { a: 5, b: 8, c: 'ccc', d: 'dd', z: 6 })
+
+  expect(value.entries[0]).toEqual(8)
+})

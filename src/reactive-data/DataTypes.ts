@@ -26,17 +26,6 @@ export type ComputeBase<T> = {
 }
 export type ComputeFunc<T> = ComputeBase<T> | ComputeFormula
 
-// export type ComputeBaseMap<T> = {
-//   [key: string]: ComputeBase<T>
-// }
-
-// export type ComputeDefaultMap<T> = {
-//   _default: ComputeFunc<T>
-//   [key: string]: ComputeFunc<T>
-// }
-
-// export type Compute<T> = ComputeFunc<T> | ComputeDefaultMap<T>
-
 export interface IDataItem<T> {
   id: string
   availableValues?: T[]
@@ -54,8 +43,3 @@ export function isFuncDef<T>(compute: ComputeFunc<T>): compute is ComputeBase<T>
     && isFunction(compute.func)
     && isArray(compute.dependsOn)
 }
-
-// export function isComputeDefMap<T>(compute: ComputeFunc<T>): compute is ComputeDefaultMap<T> {
-//   return isObject(compute)
-//     && every(compute, (v: ComputeFunc<T>) => isFormula(v) || isFuncDef(v))
-// }

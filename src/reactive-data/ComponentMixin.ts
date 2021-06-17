@@ -1,12 +1,12 @@
 import { PropType, computed, Ref } from 'vue'
-import { IState } from '@/common/DataTypes'
+import { IState } from './DataTypes'
 
-export interface ITradeFormEventPayload {
+export interface IUpdateItemEventPayload {
   prop: string
   value: any
 }
 
-export const tradeMixin = {
+export const ComponentMixin = {
   props: {
     model: {
       type: Object as PropType<IState>,
@@ -15,13 +15,13 @@ export const tradeMixin = {
   },
   emits: {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    update(payload: ITradeFormEventPayload) {
+    update(payload: IUpdateItemEventPayload) {
       return true
     }
   }
 }
 
-export function buildChangePropEmiter(modelRef: Ref<IState>, emit: Function) {
+export function buildPropBuilder(modelRef: Ref<IState>, emit: Function) {
   return (prop: string) => (
     computed({
       get: () => modelRef.value[prop],
@@ -30,11 +30,4 @@ export function buildChangePropEmiter(modelRef: Ref<IState>, emit: Function) {
       }
     })
   )
-}
-
-export function emitedProp<T>(get: () => T, prop: string, emit: Function) {
-  return computed({
-    get,
-    set: (value: T) => emit('update', { prop, value })
-  })
 }

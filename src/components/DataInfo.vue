@@ -12,11 +12,9 @@ el-scrollbar
 
 <script lang="ts">
 import { computed as c, toRefs, defineComponent } from 'vue'
-import { isFormula, isFuncDef } from '@/common/DataTypes'
-import tradeModule from '@/store/TradeEditModule'
-import {
-  find,
-} from 'lodash'
+import find from 'lodash/find'
+import { isFormula, isFuncDef } from '../reactive-data'
+import tradeModule from '../store/TradeEditModule'
 
 export default defineComponent({
   props: {

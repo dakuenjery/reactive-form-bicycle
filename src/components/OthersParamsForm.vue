@@ -37,13 +37,12 @@ el-form.addtrade-form
 
 <script lang="ts">
 import { computed as c, toRefs, defineComponent, Ref, ref, provide } from 'vue'
-import { tradeMixin, buildChangePropEmiter } from '@/common/FormComponentMixin'
 import DataItem from '@/components/DataItem.vue'
-import { IState } from '@/common/DataTypes'
 import { ElMessage } from 'element-plus'
-import tradeModule from '@/store/TradeEditModule'
 import keys from 'lodash/keys'
 import without from 'lodash/without'
+import tradeModule from '../store/TradeEditModule'
+import { IState, ComponentMixin, buildPropBuilder } from '../reactive-data'
 
 const ignoreProps = [
   'instrument',
@@ -59,13 +58,13 @@ const ignoreProps = [
 ]
 
 export default defineComponent({
-  ...tradeMixin,
+  ...ComponentMixin,
   components: { DataItem },
   setup(props, { emit }) {
     const propRefs = toRefs(props)
     const model = propRefs.model as Ref<IState>
 
-    const emitPropBuilder = buildChangePropEmiter(model, emit)
+    const emitPropBuilder = buildPropBuilder(model, emit)
     provide('propBuilder', emitPropBuilder)
 
     const formProps = c(() => without(keys(model.value), ...ignoreProps))

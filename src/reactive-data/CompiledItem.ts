@@ -37,7 +37,6 @@ export class CompiledItem<T> {
 
     if (isFunction(base.default))
       this.defaultValue = base.default
-
     else
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       this.defaultValue = _ => base.default as T
@@ -53,11 +52,17 @@ export class CompiledItem<T> {
   }
 }
 
+function filterFormulaSymbols(x: math.MathNode): boolean {
+  return (x.isSymbolNode && x.name!.startsWith('$') && !x.name!.startsWith('$$')) || false
+}
+
 function buildFormula(formula: string): ComputeBase<any> {
   const node = math.parse!(formula)
-  const nodeNames = node.filter(x => x.isSymbolNode && x.name?.startsWith('$'))
+  const nodeNames = node.filter(filterFormulaSymbols)
     .map(x => x.name?.substring(1))
 
+  // console.log('formula', formula)
+  // console.log('formula nodes:', nodeNames)
   const f = node.compile()
 
   return {

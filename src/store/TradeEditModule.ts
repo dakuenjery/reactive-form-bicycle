@@ -1,10 +1,9 @@
 /* eslint-disable no-console */
 import { VuexModule, Module, Mutation, Action } from 'vuex-class-modules'
-import { DataItems } from '@/common/DataItemsDefinition'
-import { DataObject } from '@/common/DataObject'
-import { IState, ICommitArg, IDataItem } from '@/common/DataTypes'
+import { DataItems } from '@/DataItemsDefinition'
 import defaults from 'lodash/defaults'
 import clone from 'lodash/clone'
+import { DataObject, IState, ICommitArg, IDataItem } from '../reactive-data'
 import store from '.'
 
 interface IModuleMutation {
@@ -51,11 +50,13 @@ class TradeEditModule extends VuexModule {
   @Action
   async update({ prop, value }: ICommitArg) {
     try {
+      console.log('state', this.state)
       const commits = this.dataObj.update(prop, value, this.state)
-      console.log(commits)
+      console.log('commits:', commits)
       this.mutateValues(commits)
     } catch (err) {
       console.error('update err', err)
+      console.error('state', this.state)
     }
   }
 }

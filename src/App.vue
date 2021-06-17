@@ -11,11 +11,11 @@ div.flex.justify-center.container.m-8
 
 <script lang="ts">
 import { computed as c, defineComponent } from 'vue'
-import tradeModule from '@/store/TradeEditModule'
-import TradeBasicParamsForm from '@/components/TradeBasicParamsForm.vue'
-import TradeRiskParamsForm from '@/components/TradeRiskParamsForm.vue'
-import OthersParamsForm from '@/components/OthersParamsForm.vue'
-import { ITradeFormEventPayload } from '@/common/FormComponentMixin'
+import TradeBasicParamsForm from './components/TradeBasicParamsForm.vue'
+import TradeRiskParamsForm from './components/TradeRiskParamsForm.vue'
+import OthersParamsForm from './components/OthersParamsForm.vue'
+import tradeModule from './store/TradeEditModule'
+import { IUpdateItemEventPayload } from './reactive-data'
 
 export default defineComponent({
   name: 'App',
@@ -25,7 +25,7 @@ export default defineComponent({
   setup() {
     const data = c(() => tradeModule.state)
 
-    const upd = (payload: ITradeFormEventPayload) => {
+    const upd = (payload: IUpdateItemEventPayload) => {
       tradeModule.update(payload)
     }
 

@@ -10,18 +10,17 @@ el-form.addtrade-form
 
 <script lang="ts">
 import { toRefs, defineComponent, Ref, provide } from 'vue'
-import { tradeMixin, buildChangePropEmiter } from '@/common/FormComponentMixin'
-import { IState } from '@/common/DataTypes'
-import DataItem from '@/components/DataItem.vue'
+import { IState, ComponentMixin as mixin, buildPropBuilder } from '../reactive-data'
+import DataItem from './DataItem.vue'
 
 export default defineComponent({
-  ...tradeMixin,
+  ...mixin,
   components: { DataItem },
   setup(props, { emit }) {
     const propRefs = toRefs(props)
     const model = propRefs.model as any as Ref<IState>
 
-    const emitPropBuilder = buildChangePropEmiter(model, emit)
+    const emitPropBuilder = buildPropBuilder(model, emit)
     provide('propBuilder', emitPropBuilder)
 
     return {}
